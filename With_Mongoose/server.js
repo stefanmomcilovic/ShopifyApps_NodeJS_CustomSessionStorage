@@ -119,6 +119,13 @@ mongoose.connect(process.env.DATABASE_URI)
       } else {
         await handleRequest(ctx);
       }
+      
+      // This shop hasn't been seen yet, go through OAuth to create a session
+      if ((doc == null || undefined) || doc.length == 0 || (doc.shop == undefined || null)) {
+        ctx.redirect(`/auth?shop=${shop}`);
+      } else {
+        await handleRequest(ctx);
+      }
     });
 
     server.use(router.allowedMethods());
