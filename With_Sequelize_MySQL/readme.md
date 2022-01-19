@@ -2,7 +2,10 @@
 
         shopify app create node 
 
-2. Then in project folder install "npm install --save sequelize"
+2. Then in project folder install 
+      
+        npm install --save sequelize
+
 
 3. When you install sequelize then choose your database and install it
     
