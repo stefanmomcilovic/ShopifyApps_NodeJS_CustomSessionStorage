@@ -142,11 +142,11 @@ app.prepare().then(async () => {
     console.log("---------- /USER ------------");
     // End of Getting our current user //
     // This shop hasn't been seen yet, go through OAuth to create a session
-    if (user == null || user.shop == undefined) {
-      ctx.redirect(`/auth?shop=${shop}`);
-    } else {
-      await handleRequest(ctx);
-    }
+      if (user == null || user.length == 0 || (user.shop == undefined || null)) {
+        ctx.redirect(`/auth?shop=${shop}`);
+      } else {
+        await handleRequest(ctx);
+      }
   });
 
   server.use(router.allowedMethods());
