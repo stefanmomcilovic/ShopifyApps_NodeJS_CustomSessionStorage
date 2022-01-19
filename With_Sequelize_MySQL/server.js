@@ -130,7 +130,7 @@ sequelize.sync({force: true})
               limit:1
             });
           // This shop hasn't been seen yet, go through OAuth to create a session
-          if (user == null || user.length == 0 || (user[0].shop == undefined || null)) {
+          if ((user == null || undefined) || user.length == 0 || (user[0].shop == undefined || null)) {
             ctx.redirect(`/auth?shop=${shop}`);
           } else {
             await handleRequest(ctx);
