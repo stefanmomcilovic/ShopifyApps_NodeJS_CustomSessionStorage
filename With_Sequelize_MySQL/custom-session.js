@@ -1,9 +1,11 @@
+const sequelize = require("./database/database");
 const { Session } = require("@shopify/shopify-api/dist/auth/session");
 const { Shopify_custom_session_storage } = require("./../models/sequelizeModels");
 const { Op } = require("sequelize");
 
 async function storeCallback(session){
     console.log('storeCallback session: ', session);
+    let transaction = await sequelize.transaction();
 
     try {
         let shopId;
@@ -22,7 +24,8 @@ async function storeCallback(session){
             isOnline: `${session.isOnline}`,
             accessToken: `${session.accessToken}`,
             onlineAccessInfo: `${ '' +JSON.stringify(session.onlineAccessInfo) + ''}`
-        });
+        }, {transaction});
+        await transaction.commit();
 
         if(sessionData){
             return true;
@@ -30,12 +33,17 @@ async function storeCallback(session){
             return false;
         }
     }catch(err){
-        if(err) throw err;
+        console.log('storeCallback Error: ', err);
+        if(transaction) {
+            await transaction.rollback();
+        }
         return false;
     }
 }
 
 async function loadCallback(id){
+    let transaction = await sequelize.transaction();
+
     try {
         console.log('loadCallback Id: ', id);
         let session = new Session(id);
@@ -50,7 +58,8 @@ async function loadCallback(id){
                 ]
             },
             raw: true
-        });
+        }, {transaction});
+        await transaction.commit();
 
         if(result.length > 0){
             console.log("---------------- RESULT ------------------");
@@ -74,13 +83,18 @@ async function loadCallback(id){
         }
         
     } catch(err) {
-        if(err) throw err;
+        console.log('loadCallback Error: ', err);
+        if(transaction) {
+            await transaction.rollback();
+        }
         return undefined;
     }
   
 }
 
 async function deleteCallback(id){
+    let transaction = await sequelize.transaction();
+
     try{
         console.log('deleteCallback ID: ', id);
 
@@ -92,7 +106,9 @@ async function deleteCallback(id){
                     { shopId: id }
                ]
             }
-        });
+        }, {transaction});
+        await transaction.commit();
+
 
         if(deleteCall){
             return true;
@@ -100,7 +116,10 @@ async function deleteCallback(id){
             return false;
         }
     }catch(err){
-        if(err) throw err;
+        console.log('deleteCallback Error: ', err);
+        if(transaction) {
+            await transaction.rollback();
+        }
         return false;
     }
 }
